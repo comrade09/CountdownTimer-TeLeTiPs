@@ -29,6 +29,6 @@ HELP_TEXT = """
 <i>Do not do more than 2 countdowns at the same time using the same bot.</i>
 """
 
-TUTORIAL_TEXT = "💡 | Click the **🎥 Video** button to see the way of creating this bot for your group easily."
+TUTORIAL_TEXT = "💡 | Click "
 
 #Copyright ©️ 2021 TeLe TiPs. All Rights Reserved.
