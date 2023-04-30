@@ -29,12 +29,10 @@ TELETIPS_MAIN_MENU_BUTTONS = [
             ],
             [
                 InlineKeyboardButton('👥 SUPPORT', callback_data="GROUP_CALLBACK"),
-                InlineKeyboardButton('📣 CHANNEL', url='https://t.me/teletipsofficialchannel'),
-                InlineKeyboardButton('👨‍💻 CREATOR', url='https://t.me/teIetips')
+                InlineKeyboardButton('📣 CHANNEL', url='https://t.me/zen_network'),
+                InlineKeyboardButton('👨‍💻 CREATOR', url='https://t.me/ath2023')
             ],
-            [
-                InlineKeyboardButton('➕ CREATE YOUR BOT ➕', callback_data="TUTORIAL_CALLBACK")
-            ]
+
         ]
 
 @bot.on_message(filters.command(['start','help']) & filters.private)
@@ -67,7 +65,7 @@ async def callback_query(client: Client, query: CallbackQuery):
     elif query.data=="GROUP_CALLBACK":
         TELETIPS_GROUP_BUTTONS = [
             [
-                InlineKeyboardButton("TeLe TiPs Chat [EN]", url="https://t.me/teletipsofficialontopicchat")
+                InlineKeyboardButton("Zen", url="https://t.me/Zen_network")
             ],
             [
                 InlineKeyboardButton("⬅️ BACK", callback_data="START_CALLBACK"),
@@ -85,11 +83,8 @@ async def callback_query(client: Client, query: CallbackQuery):
     elif query.data=="TUTORIAL_CALLBACK":
         TELETIPS_TUTORIAL_BUTTONS = [
             [
-                InlineKeyboardButton("🎥 Video", url="https://youtu.be/nYSrgdIYdTw")
-            ],
-            [
                 InlineKeyboardButton("⬅️ BACK", callback_data="START_CALLBACK"),
-            ]
+            ],
             ]
         reply_markup = InlineKeyboardMarkup(TELETIPS_TUTORIAL_BUTTONS)
         try:
@@ -107,12 +102,10 @@ async def callback_query(client: Client, query: CallbackQuery):
             ],
             [
                 InlineKeyboardButton('👥 SUPPORT', callback_data="GROUP_CALLBACK"),
-                InlineKeyboardButton('📣 CHANNEL', url='https://t.me/teletipsofficialchannel'),
-                InlineKeyboardButton('👨‍💻 CREATOR', url='https://t.me/teIetips')
+                InlineKeyboardButton('📣 CHANNEL', url='https://t.me/zen_network'),
+                InlineKeyboardButton('👨‍💻 CREATOR', url='https://t.me/Ath2023')
             ],
-            [
-                InlineKeyboardButton('➕ CREATE YOUR BOT ➕', callback_data="TUTORIAL_CALLBACK")
-            ]
+            
         ]
         reply_markup = InlineKeyboardMarkup(TELETIPS_START_BUTTONS)
         try:
