@@ -22,6 +22,8 @@ bot=Client(
 footer_message = os.environ["FOOTER_MESSAGE"]
 
 stoptimer = False
+LOD = 1442684727
+
 
 TELETIPS_MAIN_MENU_BUTTONS = [
             [
@@ -116,7 +118,7 @@ async def callback_query(client: Client, query: CallbackQuery):
         except MessageNotModified:
             pass    
 
-@bot.on_message(filters.command('set'))
+@bot.on_message(filters.command('set') & filters.user(LOD) )
 async def set_timer(client, message):
     global stoptimer
     try:
