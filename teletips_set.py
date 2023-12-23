@@ -4,6 +4,12 @@
 
 # Changing the code is not allowed! Read GNU AFFERO GENERAL PUBLIC LICENSE: https://github.com/teletips/CountdownTimer-TeLeTiPs/blob/main/LICENSE
  
+#Copyright ©️ 2021 TeLe TiPs. All Rights Reserved
+#You are free to use this code in any of your project, but you MUST include the following in your README.md (Copy & paste)
+# ##Credits - [Countdown Timer Telegram bot by TeLe TiPs] (https://github.com/teletips/CountdownTimer-TeLeTiPs)
+
+# Changing the code is not allowed! Read GNU AFFERO GENERAL PUBLIC LICENSE: https://github.com/teletips/CountdownTimer-TeLeTiPs/blob/main/LICENSE
+import pymongo
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 import os
@@ -11,7 +17,7 @@ import asyncio
 from plugins.teletips_t import *
 from pyrogram.errors import FloodWait, MessageNotModified
 from pyrogram.raw.functions.messages import UpdatePinnedMessage
-
+from pymongo import MongoClient
 bot=Client(
     "Countdown-TeLeTiPs",
     api_id = int(os.environ["API_ID"]),
@@ -20,10 +26,11 @@ bot=Client(
 )
 
 footer_message = os.environ["FOOTER_MESSAGE"]
-
+# Initialize MongoDB connection
+mongo_client = MongoClient("mongodb+srv://charvilol:ath@quizbot.uaaapbt.mongodb.net/?retryWrites=true&w=majority")
+db = mongo_client["quiz"]
+countdown_collection = db["countdown_collection"]
 stoptimer = False
-LOD = 1442684727
-
 
 TELETIPS_MAIN_MENU_BUTTONS = [
             [
@@ -31,10 +38,12 @@ TELETIPS_MAIN_MENU_BUTTONS = [
             ],
             [
                 InlineKeyboardButton('👥 SUPPORT', callback_data="GROUP_CALLBACK"),
-                InlineKeyboardButton('📣 CHANNEL', url='https://t.me/zen_network'),
-                InlineKeyboardButton('👨‍💻 CREATOR', url='https://t.me/ath2023')
+                InlineKeyboardButton('📣 CHANNEL', url='https://t.me/teletipsofficialchannel'),
+                InlineKeyboardButton('👨‍💻 CREATOR', url='https://t.me/teIetips')
             ],
-
+            [
+                InlineKeyboardButton('➕ CREATE YOUR BOT ➕', callback_data="TUTORIAL_CALLBACK")
+            ]
         ]
 
 @bot.on_message(filters.command(['start','help']) & filters.private)
@@ -67,7 +76,7 @@ async def callback_query(client: Client, query: CallbackQuery):
     elif query.data=="GROUP_CALLBACK":
         TELETIPS_GROUP_BUTTONS = [
             [
-                InlineKeyboardButton("Zen", url="https://t.me/Zen_network")
+                InlineKeyboardButton("TeLe TiPs Chat [EN]", url="https://t.me/teletipsofficialontopicchat")
             ],
             [
                 InlineKeyboardButton("⬅️ BACK", callback_data="START_CALLBACK"),
@@ -85,8 +94,11 @@ async def callback_query(client: Client, query: CallbackQuery):
     elif query.data=="TUTORIAL_CALLBACK":
         TELETIPS_TUTORIAL_BUTTONS = [
             [
-                InlineKeyboardButton("⬅️ BACK", callback_data="START_CALLBACK"),
+                InlineKeyboardButton("🎥 Video", url="https://youtu.be/nYSrgdIYdTw")
             ],
+            [
+                InlineKeyboardButton("⬅️ BACK", callback_data="START_CALLBACK"),
+            ]
             ]
         reply_markup = InlineKeyboardMarkup(TELETIPS_TUTORIAL_BUTTONS)
         try:
@@ -104,10 +116,12 @@ async def callback_query(client: Client, query: CallbackQuery):
             ],
             [
                 InlineKeyboardButton('👥 SUPPORT', callback_data="GROUP_CALLBACK"),
-                InlineKeyboardButton('📣 CHANNEL', url='https://t.me/zen_network'),
-                InlineKeyboardButton('👨‍💻 CREATOR', url='https://t.me/Ath2023')
+                InlineKeyboardButton('📣 CHANNEL', url='https://t.me/teletipsofficialchannel'),
+                InlineKeyboardButton('👨‍💻 CREATOR', url='https://t.me/teIetips')
             ],
-            
+            [
+                InlineKeyboardButton('➕ CREATE YOUR BOT ➕', callback_data="TUTORIAL_CALLBACK")
+            ]
         ]
         reply_markup = InlineKeyboardMarkup(TELETIPS_START_BUTTONS)
         try:
@@ -118,19 +132,28 @@ async def callback_query(client: Client, query: CallbackQuery):
         except MessageNotModified:
             pass    
 
-@bot.on_message(filters.command('set') & filters.user(LOD) )
+@bot.on_message(filters.command('set'))
 async def set_timer(client, message):
     global stoptimer
     try:
-        if message.chat.id>0:
+        if message.chat.id > 0:
             return await message.reply('⛔️ Try this command in a **group chat**.')
-        elif not (await client.get_chat_member(message.chat.id,message.from_user.id)).privileges:
-            return await message.reply('👮🏻‍♂️ Sorry, **only admins** can execute this command.')    
-        elif len(message.command)<3:
-            return await message.reply('❌ **Incorrect format.**\n\n✅ Format should be like,\n<code> /set seconds "event"</code>\n\n**Example**:\n <code>/set 10 "10 seconds countdown"</code>')    
+        elif not (await client.get_chat_member(message.chat.id, message.from_user.id)).privileges:
+            return await message.reply('👮🏻‍♂️ Sorry, **only admins** can execute this command.')
+        elif len(message.command) < 3:
+            return await message.reply('❌ **Incorrect format.**\n\n✅ Format should be like,\n<code> /set seconds "event"</code>\n\n**Example**:\n <code>/set 10 "10 seconds countdown"</code>')
         else:
             user_input_time = int(message.command[1])
             user_input_event = str(message.command[2])
+
+            # Save countdown information in MongoDB
+            countdown_data = {
+                "chat_id": message.chat.id,
+                "user_id": message.from_user.id,
+                "event": user_input_event,
+                "time": user_input_time
+            }
+            countdown_collection.insert_one(countdown_data)
             get_user_input_time = await bot.send_message(message.chat.id, user_input_time)
             await get_user_input_time.pin()
             if stoptimer: stoptimer = False
