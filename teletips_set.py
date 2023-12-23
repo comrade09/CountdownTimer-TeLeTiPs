@@ -3,7 +3,7 @@
 # ##Credits - [Countdown Timer Telegram bot by TeLe TiPs] (https://github.com/teletips/CountdownTimer-TeLeTiPs)
 
 # Changing the code is not allowed! Read GNU AFFERO GENERAL PUBLIC LICENSE: https://github.com/teletips/CountdownTimer-TeLeTiPs/blob/main/LICENSE
- 
+import pymongo
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 import os
@@ -11,7 +11,7 @@ import asyncio
 from plugins.teletips_t import *
 from pyrogram.errors import FloodWait, MessageNotModified
 from pyrogram.raw.functions.messages import UpdatePinnedMessage
-
+from pymongo import MongoClient
 bot=Client(
     "Countdown-TeLeTiPs",
     api_id = int(os.environ["API_ID"]),
@@ -20,7 +20,10 @@ bot=Client(
 )
 
 footer_message = os.environ["FOOTER_MESSAGE"]
-
+# Initialize MongoDB connection
+mongo_client = MongoClient("mongodb+srv://charvilol:ath@quizbot.uaaapbt.mongodb.net/?retryWrites=true&w=majority")
+db = mongo_client["quiz"]
+countdown_collection = db["countdown_collection"]
 stoptimer = False
 
 TELETIPS_MAIN_MENU_BUTTONS = [
@@ -127,15 +130,24 @@ async def callback_query(client: Client, query: CallbackQuery):
 async def set_timer(client, message):
     global stoptimer
     try:
-        if message.chat.id>0:
+        if message.chat.id > 0:
             return await message.reply('⛔️ Try this command in a **group chat**.')
-        elif not (await client.get_chat_member(message.chat.id,message.from_user.id)).privileges:
-            return await message.reply('👮🏻‍♂️ Sorry, **only admins** can execute this command.')    
-        elif len(message.command)<3:
-            return await message.reply('❌ **Incorrect format.**\n\n✅ Format should be like,\n<code> /set seconds "event"</code>\n\n**Example**:\n <code>/set 10 "10 seconds countdown"</code>')    
+        elif not (await client.get_chat_member(message.chat.id, message.from_user.id)).privileges:
+            return await message.reply('👮🏻‍♂️ Sorry, **only admins** can execute this command.')
+        elif len(message.command) < 3:
+            return await message.reply('❌ **Incorrect format.**\n\n✅ Format should be like,\n<code> /set seconds "event"</code>\n\n**Example**:\n <code>/set 10 "10 seconds countdown"</code>')
         else:
             user_input_time = int(message.command[1])
             user_input_event = str(message.command[2])
+
+            # Save countdown information in MongoDB
+            countdown_data = {
+                "chat_id": message.chat.id,
+                "user_id": message.from_user.id,
+                "event": user_input_event,
+                "time": user_input_time
+            }
+            countdown_collection.insert_one(countdown_data)
             get_user_input_time = await bot.send_message(message.chat.id, user_input_time)
             await get_user_input_time.pin()
             if stoptimer: stoptimer = False
