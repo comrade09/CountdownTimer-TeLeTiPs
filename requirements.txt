@@ -1,5 +1,6 @@
 pyrogram
 yt-dlp
+urllib3
 requests
 TgCrypto
 moviepy
