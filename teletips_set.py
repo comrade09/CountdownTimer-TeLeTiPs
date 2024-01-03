@@ -9,6 +9,7 @@
 # ##Credits - [Countdown Timer Telegram bot by TeLe TiPs] (https://github.com/teletips/CountdownTimer-TeLeTiPs)
 
 # Changing the code is not allowed! Read GNU AFFERO GENERAL PUBLIC LICENSE: https://github.com/teletips/CountdownTimer-TeLeTiPs/blob/main/LICEN
+import pyrebase
 import urllib3
 from urllib3 import is_appengine_sandbox
 import os
